@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import difflib
 import getpass
 import hashlib
 import json
@@ -459,17 +458,14 @@ def change_message(old: dict, new: dict, url: str, date: str) -> str | None:
     # Ignore harmless reordering and identical repeated elements.
     if set(old["lines"]) == set(new["lines"]):
         return None
-    diff = list(difflib.ndiff(old["lines"], new["lines"]))
-    added = list(dict.fromkeys(s[2:] for s in diff if s.startswith("+ ")))
-    removed = list(dict.fromkeys(s[2:] for s in diff if s.startswith("- ")))
-    header = f"🏫 **GIMB — spremembe na intranetu** · {date}\n**{escape(new['title'])[:180]}**\n"
+    # Only report newly added content; removals alone stay silent.
+    old_lines = set(old["lines"])
+    added = list(dict.fromkeys(line for line in new["lines"] if line not in old_lines))
+    if not added:
+        return None
+    header = f"🏫 **GIMB — novo na intranetu** · {date}\n**{escape(new['title'])[:180]}**\n"
     text = header
-    for label, values in (
-        ("Novo / posodobljeno", added),
-        ("Odstranjeno / prejšnje besedilo", removed),
-    ):
-        if not values:
-            continue
+    for label, values in (("Novo", added),):
         text += f"\n**{label}:**\n"
         for value in values[:8]:
             piece = "• " + escape(value)[:220] + ("…" if len(escape(value)) > 220 else "") + "\n"

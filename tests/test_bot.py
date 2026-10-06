@@ -475,3 +475,12 @@ def test_deeper_general_forms_are_not_downloaded():
     assert len(pages) == 3
     assert report["counts"]["file"] == 0
     assert pages[general]["links"][0]["url"].endswith("agreement.pdf")
+
+
+def test_removed_lines_alone_stay_silent():
+    old = {"lines": ["Obvestilo A", "Obvestilo B"], "title": "Intranet"}
+    new = {"lines": ["Obvestilo A"], "title": "Intranet"}
+    assert bot.change_message(old, new, URL, "today") is None
+    message = bot.change_message(new, {**new, "lines": ["Novo obvestilo", "Obvestilo A"]}, URL, "today")
+    assert "Novo obvestilo" in message
+    assert "Obvestilo A" not in message
