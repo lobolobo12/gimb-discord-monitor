@@ -156,6 +156,8 @@ docker compose logs -f
 
 The container runs `bot.py run`, restarts automatically after crashes and server reboots, and keeps its snapshots in the `data` Docker volume. It is limited to 256 MB of RAM and half a CPU. The first check saves a silent baseline. Update with `git pull && docker compose up -d --build`. Run other commands inside it, for example `docker compose exec monitor /app/.venv/bin/python bot.py status`.
 
+With rootless Docker, run `loginctl enable-linger` once so Docker keeps running after you log out and starts after a reboot.
+
 Disable the macOS background job when the server takes over, or both will post the same notices.
 
 ## Local data
