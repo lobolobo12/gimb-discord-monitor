@@ -141,6 +141,23 @@ rm ~/Library/LaunchAgents/org.gimb.discord-monitor.plist
 
 The job reads `.env` on its next run after settings change. Restart a foreground `run` process to reload settings. Reinstall the job after moving the project folder. Do not run setup during an active background check.
 
+## Run on a server with Docker
+
+On a Linux server with Docker and the Compose plugin:
+
+```sh
+git clone https://github.com/lobolobo12/gimb-discord-monitor.git
+cd gimb-discord-monitor
+# Copy your filled-in .env here (for example with scp), then:
+chmod 600 .env
+docker compose up -d --build
+docker compose logs -f
+```
+
+The container runs `bot.py run`, restarts automatically after crashes and server reboots, and keeps its snapshots in the `data` Docker volume. It is limited to 256 MB of RAM and half a CPU. The first check saves a silent baseline. Update with `git pull && docker compose up -d --build`. Run other commands inside it, for example `docker compose exec monitor /app/.venv/bin/python bot.py status`.
+
+Disable the macOS background job when the server takes over, or both will post the same notices.
+
 ## Local data
 
 `.env` holds credentials in **plaintext**, with owner-only permissions when created by setup. The bot submits school credentials only to the school's login form. `.env`, downloaded inspection data, snapshots, logs, and local environments are ignored by Git and are not included in this repository.
