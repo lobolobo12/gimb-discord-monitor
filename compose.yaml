@@ -6,6 +6,9 @@ services:
     volumes:
       - data:/app/data
     restart: unless-stopped
+    labels:
+      # Built locally, not pulled from a registry; update with git pull + build.
+      com.centurylinklabs.watchtower.enable: "false"
     mem_limit: 256m
     cpus: 0.5
     logging:
